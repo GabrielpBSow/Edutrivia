@@ -1,0 +1,646 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@500&family=Montserrat+Alternates&family=Poppins:wght@300;400&family=Roboto&display=swap');
+
+/* ============================================================
+   VARIABLES COMPARTIDAS
+   ============================================================ */
+:root {
+    /* Colores de la universidad (logo UP): morado, rojo/coral y naranja */
+    --uni-purple: #5B2C8C;
+    --uni-purple-dark: #3E1F63;
+    --uni-red: #EF3E36;
+    --uni-orange: #F7A600;
+
+    --color-title: #3E1F63;
+    --color-font: #ececec;
+    --color-buttom: #EF3E36;
+    --color-footer: #5B2C8C;
+    --color-jeopardy: #F7A600;
+
+    --clr-main: #5B2C8C;
+    --clr-main-light: #8B5CB8;
+    --clr-gray: #e2e2e2;
+    --clr-red: #961818;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, p, a, input, textarea, ul {
+    margin: 0;
+    padding: 0;
+}
+
+ul { list-style-type: none; }
+a { text-decoration: none; }
+
+/* ============================================================
+   PANEL / SIDEBAR (compartido por Administrador, Profesor y Estudiante)
+   ============================================================ */
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    background-color: var(--color-footer);
+    min-height: 100vh;
+    width: 100%;
+}
+
+aside {
+    padding: 1rem;
+    padding-right: 0;
+    color: var(--color-font);
+    position: sticky;
+    top: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font-weight: 400;
+    font-size: 1.3rem;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.boton-menu {
+    background-color: transparent;
+    border: 0;
+    color: var(--color-font);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 900;
+    padding: 1rem;
+    font-size: .85rem;
+    width: 100%;
+}
+
+.boton-menu.active {
+    background-color: var(--color-font);
+    color: var(--clr-main);
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    position: relative;
+}
+
+.boton-menu.active::before {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 2rem;
+    bottom: 100%;
+    right: 0;
+    background-color: transparent;
+    border-bottom-right-radius: .5rem;
+    box-shadow: 0 1rem 0 var(--color-font);
+}
+
+.boton-menu.active::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 2rem;
+    top: 100%;
+    right: 0;
+    background-color: transparent;
+    border-top-right-radius: .5rem;
+    box-shadow: 0 -1rem 0 var(--color-font);
+}
+
+.boton-carrito {
+    margin-top: 4rem;
+}
+
+.texto-footer {
+    color: var(--color-font);
+    text-align: left;
+    font-size: .95rem;
+    margin: 1rem;
+}
+
+main {
+    background-color: var(--color-font);
+    margin: 1rem;
+    margin-left: 0;
+    border-radius: 2rem;
+    padding: 1.5rem;
+}
+
+.titulo-principal {
+    color: var(--clr-main);
+    margin-bottom: 2rem;
+}
+
+.header-mobile { display: none; }
+.close-menu { display: none; }
+.disabled { display: none; }
+
+/* ============================================================
+   RESPONSIVO DEL PANEL
+   ============================================================ */
+@media screen and (max-width: 600px) {
+    .wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    aside {
+        position: fixed;
+        z-index: 9;
+        background-color: var(--clr-main);
+        left: 0;
+        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .75);
+        transform: translateX(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: .2s;
+    }
+
+    .aside-visible {
+        transform: translateX(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .boton-menu.active::before,
+    .boton-menu.active::after {
+        display: none;
+    }
+
+    main {
+        margin: 1rem;
+        margin-top: 0;
+        padding: 1.5rem;
+    }
+
+    .header-mobile {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-mobile .logo {
+        color: var(--clr-gray);
+    }
+
+    .open-menu, .close-menu {
+        background-color: transparent;
+        color: var(--clr-gray);
+        border: 0;
+        font-size: 2rem;
+        cursor: pointer;
+    }
+
+    .close-menu {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+}
+
+/* ============================================================
+   FORMULARIOS Y TABLAS DE GESTIÓN
+   (crear/editar preguntas, usuarios, mazos, clases, listados)
+   ============================================================ */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Fondo sólido con los colores de la universidad — la foto del
+   salón de clases se reserva para el login/portada, aquí competía
+   demasiado con el contenido y no se veía profesional */
+.fondo {
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+    background: radial-gradient(circle at top left, #4a2374 0%, transparent 55%),
+                radial-gradient(circle at bottom right, #7a3fb0 0%, transparent 50%),
+                linear-gradient(160deg, var(--uni-purple-dark) 0%, #24123d 60%, #1a0e2c 100%);
+    background-attachment: fixed;
+}
+
+/* Contenedor que centra y limita el ancho de TODO el contenido de
+   una pantalla de gestión — nada vuelve a estirarse de borde a borde */
+.contenedor-gestion {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.top {
+    color: var(--color-jeopardy);
+    text-align: center;
+    font-size: 1.8rem;
+    padding: 2rem 0;
+}
+
+.menu-options {
+    text-align: center;
+    color: var(--color-font);
+}
+
+/* Título de las páginas de gestión */
+.pagina-titulo {
+    color: #fff;
+    text-align: center;
+    margin: 1rem auto 2rem;
+    font-size: clamp(1.3rem, 4vw, 2.1rem);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    padding: 0 1rem;
+}
+
+/* La tarjeta del formulario: ancho fluido, nunca se sale de la
+   pantalla, ni en el celular más angosto ni en un monitor grande */
+form {
+    text-align: left;
+    width: min(92%, 420px);
+    margin: 0 auto 2rem;
+    padding: clamp(1.2rem, 4vw, 2rem);
+    border-radius: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 14px 40px rgba(0,0,0,.4);
+}
+
+/* Cada etiqueta SIEMPRE va arriba de su campo, en su propia línea */
+label {
+    display: block;
+    font-size: .9rem;
+    font-weight: 800;
+    margin: 1rem 0 .35rem;
+    color: var(--uni-purple-dark);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+label:first-of-type {
+    margin-top: 0;
+}
+
+.name_input,
+select,
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="number"] {
+    display: block;
+    width: 100%;
+    border: 2px solid #e5dcf0;
+    border-radius: 1rem;
+    background-color: #faf8fc;
+    padding: .7rem 1rem;
+    font-size: 1rem;
+    transition: border-color .15s;
+}
+
+.name_input:focus,
+select:focus,
+form input:focus {
+    outline: none;
+    border-color: var(--uni-purple);
+}
+
+select {
+    font-weight: 600;
+}
+
+/* Botón: por defecto SOLO tan ancho como su contenido (para links
+   sueltos como "Nuevo Usuario"). Dentro de un <form> sí ocupa todo
+   el ancho, porque ahí es donde tiene sentido que sea grande. */
+.btn {
+    display: inline-block;
+    width: auto;
+    border: none;
+    border-radius: 2rem;
+    background-color: var(--color-buttom);
+    padding: .8rem 2.2rem;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(239,62,54,.35);
+    transition: transform .15s, filter .15s;
+}
+
+.btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+}
+
+form .btn {
+    display: block;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* Envoltorio para centrar un botón suelto (como "Nuevo Usuario"
+   o "Nuevo Mazo") sin que se estire a lo ancho de toda la pantalla */
+.btn-wrap {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* La tabla siempre puede deslizarse horizontalmente en vez de
+   aplastar sus columnas cuando no cabe (celular, tablet vertical) */
+.table-container {
+    margin: 0 auto;
+    overflow-x: auto;
+    background: rgba(255,255,255,.08);
+    border-radius: 1.2rem;
+    padding: .5rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,.35);
+}
+
+table {
+    text-align: center;
+    width: 100%;
+    min-width: 600px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0 auto;
+}
+
+table, td {
+    color: #fff;
+}
+
+th {
+    background-color: var(--color-footer);
+    color: #fff;
+    white-space: nowrap;
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+th:first-child { border-top-left-radius: .8rem; }
+th:last-child { border-top-right-radius: .8rem; }
+
+th, td {
+    padding: 14px 12px;
+}
+
+tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    transition: background-color .15s;
+}
+
+tbody tr:hover {
+    background-color: rgba(255,255,255,.06);
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Botones de acción dentro de la tabla (editar/eliminar, ver alumnos, etc.) */
+td a {
+    display: inline-block;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: .3rem .6rem;
+    border-radius: .6rem;
+    transition: background-color .15s;
+}
+
+td a:visited {
+    color: #ffffff;
+}
+
+td a:hover {
+    background-color: rgba(255,255,255,.15);
+    color: #ffffff;
+}
+
+/* Ícono de "volver": tamaño fijo y con margen */
+.img_before {
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    margin: 1rem;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.5));
+    transition: transform .15s;
+}
+
+.img_before:hover {
+    transform: translateX(-4px);
+}
+
+@media (max-width: 480px) {
+    form {
+        width: 94%;
+        padding: 1.2rem;
+    }
+
+    .btn-wrap .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   MODAL DE CONFIRMACIÓN (SweetAlert2)
+   ============================================================ */
+.swal-edutrivia {
+    border-radius: 1.3rem !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* ============================================================
+   LOGIN / REGISTRO (login.php)
+   ============================================================ */
+body.pantalla-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-image: linear-gradient(100deg,#1111115c 0%, #1717175c 75%), url(../img/fondo_principal.jpg);
+    background-size: cover;
+}
+
+.container-form {
+    display: flex;
+    border-radius: 50px;
+    box-shadow: 0 5px 7px rgba(0, 0, 0, .1);
+    height: 500px;
+    max-width: 900px;
+    transition: all 1s ease;
+    margin: 10px;
+}
+
+.information {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: #f4e9fb;
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 20px;
+}
+
+.info-childs {
+    width: 100%;
+    padding: 0 30px;
+}
+
+.info-childs h2 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.info-childs p {
+    margin: 15px 0;
+    color: #555;
+}
+
+.info-childs input {
+    background-color: transparent;
+    outline: none;
+    border: solid 2px var(--uni-purple);
+    border-radius: 20px;
+    padding: 10px 20px;
+    color: var(--uni-purple);
+    cursor: pointer;
+    transition: background-color .3s ease;
+}
+
+.info-childs input:hover {
+    background-color: var(--uni-purple-dark);
+    border: none;
+    color: #ffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.form-information {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60%;
+    text-align: center;
+    background-color: #f8f8f8;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 20px;
+}
+
+.form-information-childs {
+    padding: 0 30px;
+}
+
+.form-information-childs h2 {
+    color: #333;
+    font-size: 2rem;
+}
+
+.form-information-childs p {
+    color: #555;
+}
+
+.icons {
+    margin: 15px 0;
+}
+
+.icons i {
+    border-radius: 50%;
+    padding: 15px;
+    cursor: pointer;
+    margin: 0 10px;
+    color: var(--uni-purple-dark);
+    border: solid thin var(--uni-purple);
+    transition: background-color .3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.icons i:hover {
+    background-color: #e8d9f5;
+    color: #fff;
+}
+
+.form { margin: 30px 0 0 0; }
+
+.form label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border-radius: 20px;
+    padding: 0 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.form label input {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    color: #333;
+}
+
+.form label i { color: #a7a7a7; }
+
+.form input[type="submit"] {
+    background-color: var(--uni-red);
+    color: #fff;
+    border-radius: 20px;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+}
+
+.form input[type="submit"]:hover {
+    background-color: #a7a7a7;
+}
+
+.hide {
+    position: absolute;
+    transform: translateY(-300%);
+}
+
+@media screen and (max-width: 750px) {
+    html { font-size: 12px; }
+}
+
+@media screen and (max-width: 580px) {
+    html { font-size: 10px; }
+
+    .container-form {
+        height: auto;
+        flex-direction: column;
+    }
+
+    .information {
+        width: 100%;
+        padding: 20px;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .form-information {
+        width: 100%;
+        padding: 20px;
+        border-bottom-left-radius: 20px;
+        border-top-right-radius: 0;
+    }
+}

@@ -1,0 +1,702 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+
+:root {
+    --padding-container: 100px 0;
+    --color-title: #001A49;
+    --color-font: #ffffff;
+    --color-buttom: #EF3E36;
+    --color-footer: #5B2C8C;
+
+    /* Colores de la universidad, reutilizados aquí para los juegos */
+    --j-purple: #5B2C8C;
+    --j-purple-dark: #2E1650;
+    --j-red: #EF3E36;
+    --j-orange: #F7A600;
+    --j-green: #21C87A;
+
+    --blue: linear-gradient(180deg, #0120CB 0%, #011BA9 100%);
+    --yellow: #FFE817;
+    --green: #90FF7E;
+    --red: #FFA57E;
+    --spooky-orange: #ad4e08;
+    --spooky-orange-text: #fffec8;
+    --gap: .6rem;
+    --text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+/* ============================================================
+   JEOPARDY
+   ============================================================ */
+body.pantalla-jeopardy {
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    min-height: 100vh;
+    background: radial-gradient(circle at top left, #4a2374 0%, transparent 55%),
+                radial-gradient(circle at bottom right, #7a3fb0 0%, transparent 50%),
+                linear-gradient(160deg, var(--j-purple-dark) 0%, #180a2c 60%, #100720 100%);
+}
+
+.top-header {
+    max-width: 1100px;
+    margin: 0 auto 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,.06);
+    border-radius: 1.2rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+.top-header h1 {
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 800;
+    margin: 0;
+}
+
+.score {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 600;
+    background: var(--j-orange);
+    color: #2a1a00;
+    padding: .5rem 1.2rem;
+    border-radius: 2rem;
+}
+
+.score-count {
+    color: #2a1a00;
+    font-size: 1.3em;
+    font-weight: 800;
+    margin-left: .2em;
+}
+
+.column ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.board {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--gap);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.board .column {
+    flex: 1 1 160px;
+    max-width: 220px;
+    background: rgba(255,255,255,.05);
+    border-radius: 1rem;
+    padding: .6rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+
+.board .column header {
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    font-size: .85rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--j-purple) 0%, #7a3fb0 100%);
+    color: #fff;
+    text-align: center;
+    margin-bottom: .6rem;
+    min-height: 3em;
+    border-radius: .7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .4rem;
+}
+
+.board .column li {
+    margin-bottom: .5rem;
+}
+
+.board .column button {
+    height: 3.2em;
+    width: 100%;
+    color: var(--j-orange);
+    font-size: 1.3rem;
+    font-weight: 800;
+    border: none;
+    border-radius: .7rem;
+    background: rgba(255,255,255,.08);
+    cursor: pointer;
+    transition: transform .15s, background-color .15s;
+}
+
+.board .column button:hover {
+    background: rgba(255,255,255,.16);
+    transform: translateY(-2px);
+}
+
+.board .column button.used {
+    visibility: hidden;
+}
+
+.card-modal {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 4, 20, .85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.card-modal.visible {
+    opacity: 1;
+    pointer-events: initial;
+}
+
+.card-modal.showing-result .result {
+    display: block;
+}
+
+.card-modal-inner {
+    width: min(90%, 560px);
+    background: #fff;
+    color: #2a1240;
+    border-radius: 1.5rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.card-modal .clue-text {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.result,
+.card-modal.showing-result form {
+    display: none;
+}
+
+.card-modal form {
+    display: flex;
+    gap: .5rem;
+}
+
+.card-modal form input[type="text"] {
+    display: block;
+    flex-grow: 1;
+    height: 3em;
+    border: 2px solid #e5dcf0;
+    border-radius: 1rem;
+    text-align: center;
+    font-size: 1rem;
+    padding: 0 1rem;
+}
+
+.card-modal form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--j-purple);
+}
+
+.card-modal form button[type="submit"] {
+    padding: 0 1.6rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    color: #fff;
+    background: var(--j-red);
+    border: 0;
+    border-radius: 1rem;
+    transition: filter .15s;
+}
+
+.card-modal form button[type="submit"]:hover {
+    filter: brightness(1.08);
+}
+
+.result_success, .result_fail {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: .5rem;
+}
+
+.result_success { color: var(--j-green); }
+.result_fail { color: var(--j-red); }
+
+.result_correct-answer {
+    font-size: 1rem;
+    color: #555;
+}
+
+.result_correct-answer-text {
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: block;
+    margin-top: .3rem;
+    color: var(--j-purple);
+}
+
+/* ============================================================
+   AHORCADO
+   ============================================================ */
+body.pantalla-ahorcado {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: var(--color-font);
+    text-align: center;
+    padding: 2rem 1rem;
+    background: radial-gradient(circle at top left, #4a2374 0%, transparent 55%),
+                radial-gradient(circle at bottom right, #7a3fb0 0%, transparent 50%),
+                linear-gradient(160deg, var(--j-purple-dark) 0%, #180a2c 60%, #100720 100%);
+}
+
+.pantalla-ahorcado h1 {
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    font-weight: 800;
+    margin: 0 0 1rem;
+}
+
+.ahorcado {
+    height: 220px;
+    width: 220px;
+    background-color: rgba(255,255,255,.06);
+    background-image: url("../img/el-ahorcado1.jpg");
+    background-size: cover;
+    background-position: center;
+    border-radius: 1.5rem;
+    margin: 1rem auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+#content-main {
+    width: min(94%, 640px);
+    background: rgba(255,255,255,.06);
+    border-radius: 1.8rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,.4);
+}
+
+#resultado {
+    color: var(--color-font);
+    text-align: center;
+    font-size: 1.3rem;
+    margin-top: 1rem;
+}
+
+#output {
+    color: var(--j-orange);
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: .1em;
+    margin: 1.5rem 0;
+}
+
+#calcular {
+    color: #fff;
+    background: var(--j-red);
+    border: none;
+    border-radius: 1rem;
+    padding: .8rem 1.6rem;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-left: .5rem;
+    cursor: pointer;
+    transition: filter .15s, transform .15s;
+}
+
+#calcular:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+}
+
+.pantalla-ahorcado input[type=text] {
+    width: 60px;
+    padding: .8rem;
+    font-size: 1.2rem;
+    text-align: center;
+    border-radius: 1rem;
+    border: 2px solid rgba(255,255,255,.2);
+    background-color: rgba(255,255,255,.08);
+    color: var(--color-font);
+    font-weight: 700;
+}
+
+.pantalla-ahorcado input[type=text]:focus {
+    outline: none;
+    border-color: var(--j-orange);
+}
+
+.pantalla-ahorcado ::placeholder {
+    color: rgba(255,255,255,.5);
+    font-size: .75rem;
+}
+
+/* ============================================================
+   ENCUESTA DE SATISFACCIÓN
+   ============================================================ */
+body.pantalla-encuesta {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background: radial-gradient(circle at top left, #4a2374 0%, transparent 55%),
+                radial-gradient(circle at bottom right, #7a3fb0 0%, transparent 50%),
+                linear-gradient(160deg, var(--j-purple-dark) 0%, #180a2c 60%, #100720 100%);
+}
+
+.encuesta-card {
+    width: min(94%, 480px);
+    background: #ffffff;
+    border-radius: 1.8rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.encuesta-icono {
+    font-size: 3rem;
+    color: var(--j-purple);
+    margin-bottom: .5rem;
+}
+
+.encuesta-card h2 {
+    color: var(--color-title);
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    margin: 0 0 .4rem;
+}
+
+.encuesta-sub {
+    color: #777;
+    font-size: .9rem;
+    margin-bottom: 1.8rem;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    gap: .7rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.8rem;
+}
+
+.option {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .4rem;
+    padding: 1rem .8rem;
+    border-radius: 1.1rem;
+    border: 2px solid #eee;
+    background: #faf8fc;
+    transition: transform .15s, border-color .15s, background-color .15s;
+    flex: 1 1 90px;
+}
+
+.option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.option-emoji {
+    font-size: 2rem;
+}
+
+.option-texto {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #555;
+}
+
+.option:hover {
+    transform: translateY(-3px);
+    border-color: #d9c8ea;
+}
+
+.option-elegida {
+    border-color: var(--j-purple);
+    background: #f0e6f9;
+    transform: translateY(-3px) scale(1.03);
+}
+
+.option-elegida .option-texto {
+    color: var(--j-purple);
+}
+
+#submitBtn {
+    margin-top: .5rem;
+}
+
+#submitBtn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* ============================================================
+   CARRERA DE CONOCIMIENTO
+   ============================================================ */
+body.pantalla-carrera {
+    font-family: 'Poppins', sans-serif;
+    color: var(--color-font);
+    text-align: center;
+    padding: 1.2rem 1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at top left, #4a2374 0%, transparent 55%),
+                radial-gradient(circle at bottom right, #7a3fb0 0%, transparent 50%),
+                linear-gradient(160deg, var(--j-purple-dark) 0%, #180a2c 60%, #100720 100%);
+    overflow: hidden;
+}
+
+.carrera-header {
+    width: min(94%, 640px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,.06);
+    border-radius: 1.2rem;
+    padding: .7rem 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    font-weight: 700;
+}
+
+.carrera-vidas {
+    letter-spacing: .2em;
+}
+
+.carrera-pregunta-caja {
+    width: min(94%, 640px);
+    background: rgba(255,255,255,.08);
+    border-radius: 1.2rem;
+    padding: 1rem 1.3rem;
+    margin-bottom: .6rem;
+}
+
+.carrera-pregunta-texto {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    font-weight: 700;
+}
+
+.carrera-timer-track {
+    width: min(94%, 640px);
+    height: 10px;
+    background: rgba(255,255,255,.12);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.carrera-timer-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--j-orange);
+    border-radius: 999px;
+    transition: width linear;
+}
+
+.carrera-pista {
+    position: relative;
+    width: min(94%, 640px);
+    flex: 1;
+    min-height: 380px;
+    background: repeating-linear-gradient(
+        180deg,
+        #33264d 0px, #33264d 40px,
+        #3c2d5c 40px, #3c2d5c 80px
+    );
+    border-radius: 1.5rem;
+    overflow: hidden;
+    display: flex;
+    box-shadow: inset 0 0 40px rgba(0,0,0,.4), 0 20px 50px rgba(0,0,0,.4);
+}
+
+.carrera-carril {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 4px dashed rgba(255,255,255,.25);
+}
+
+.carrera-carril:last-child {
+    border-right: none;
+}
+
+.carrera-opcion {
+    margin-top: 1.2rem;
+    background: #fff;
+    color: #2a1240;
+    font-weight: 700;
+    font-size: clamp(.85rem, 2.6vw, 1.05rem);
+    border-radius: 1rem;
+    padding: .8rem 1rem;
+    width: 85%;
+    box-shadow: 0 8px 20px rgba(0,0,0,.3);
+    transition: background-color .2s, color .2s, transform .2s;
+}
+
+.carrera-opcion-centro {
+    background: transparent;
+    color: rgba(255,255,255,.35);
+    box-shadow: none;
+    font-size: 1.4rem;
+}
+
+.carrera-carril.correcto .carrera-opcion {
+    background: var(--j-green);
+    color: #06331d;
+    transform: scale(1.05);
+}
+
+.carrera-carril.incorrecto .carrera-opcion {
+    background: var(--j-red);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.carrera-vehiculo {
+    position: absolute;
+    bottom: 8%;
+    font-size: 2.6rem;
+    transition: left .18s ease;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,.5));
+}
+
+.carrera-controles {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.carrera-controles button {
+    flex: 1;
+    max-width: 160px;
+    padding: .9rem;
+    font-size: 1.4rem;
+    border: none;
+    border-radius: 1rem;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color .15s, transform .15s;
+}
+
+.carrera-controles button:active {
+    background: rgba(255,255,255,.25);
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   MEMORAMA
+   ============================================================ */
+body.pantalla-memorama {
+    font-family: 'Poppins', sans-serif;
+    color: var(--color-font);
+    text-align: center;
+    padding: 1.2rem 1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at top left, #4a2374 0%, transparent 55%),
+                radial-gradient(circle at bottom right, #7a3fb0 0%, transparent 50%),
+                linear-gradient(160deg, var(--j-purple-dark) 0%, #180a2c 60%, #100720 100%);
+}
+
+.memorama-grid {
+    width: min(96%, 900px);
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 5), 1fr);
+    gap: .7rem;
+    margin-top: 1.2rem;
+}
+
+@media (max-width: 480px) {
+    .memorama-grid {
+        /* En pantallas muy angostas priorizamos legibilidad sobre la forma cuadrada */
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    }
+}
+
+.memorama-carta {
+    aspect-ratio: 3 / 4;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    perspective: 800px;
+}
+
+.memorama-carta-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform .5s;
+    transform-style: preserve-3d;
+}
+
+.memorama-carta.volteada .memorama-carta-inner,
+.memorama-carta.encontrada .memorama-carta-inner {
+    transform: rotateY(180deg);
+}
+
+.memorama-cara {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .5rem;
+    font-size: clamp(.65rem, 2.2vw, .85rem);
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0,0,0,.3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.memorama-cara-atras {
+    background: linear-gradient(135deg, var(--j-purple) 0%, #7a3fb0 100%);
+    font-size: 1.8rem;
+}
+
+.memorama-cara-frente {
+    background: #fff;
+    color: #2a1240;
+    transform: rotateY(180deg);
+}
+
+.memorama-carta.encontrada .memorama-cara-frente {
+    background: var(--j-green);
+    color: #06331d;
+}
+
+.memorama-carta.encontrada {
+    cursor: default;
+    opacity: .85;
+}

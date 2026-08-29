@@ -1,0 +1,13 @@
+# Credenciales reales de la base de datos — usar conexion.example.php como plantilla
+conexion.php
+
+# Librería de terceros (cada quien la descarga de fpdf.org, ver README)
+libs/fpdf/
+
+# Respaldos de base de datos generados localmente (pueden pesar mucho y traer datos reales)
+Backups/archivos/*.sql
+
+# Archivos propios del sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/
