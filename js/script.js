@@ -11,3 +11,15 @@ btnSignUp.addEventListener("click",e=>{
     formLogin.classList.add("hide");
     formRegister.classList.remove("hide");
 })
+
+// Detectar si se solicitó el modo registro por URL (?modo=registro)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('modo') === 'registro') {
+        const formRegistro = document.getElementById('formRegistro');
+        const formLoginBox = document.getElementById('formLoginBox');
+        
+        if (formRegistro && formLoginBox) {
+            formRegistro.classList.remove('hide');
+            formLoginBox.classList.add('hide');
+        }
+    }

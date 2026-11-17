@@ -92,8 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
 }
 
 /* ============================================================
-   REGISTRO (siempre como Estudiante — los demás roles los crea
-   el Administrador desde su panel)
+   REGISTRO
    ============================================================ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'registro') {
 
@@ -150,19 +149,53 @@ $token = csrf_token();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500&family=Montserrat+Alternates&family=Poppins&family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="img/png" href="img/LogoEdutrivia (1).png">
     <link rel="stylesheet" href="css/app.css">
     <title>Edutrivia — Acceso</title>
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+        .btn-volver-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.2s;
+        }
+        .btn-volver-home:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body class="pantalla-login">
 
-    <div class="container-form register" id="formRegistro">
+    <!-- Botón para volver al inicio corregido a index.php -->
+    <a href="principal.php" class="btn-volver-home">
+        <i class='bx bx-arrow-back'></i> Volver al Inicio
+    </a>
+
+    <!-- Formulario de Registro (Inicia oculto con la clase 'hide') -->
+    <div class="container-form register hide" id="formRegistro">
         <div class="information">
             <div class="info-childs">
                 <h2>¡¡Bienvenido!!</h2>
-                <p>Si ya tienes una cuenta, ¡Pulsa Aquí!</p>
+                <p>Si ya tienes una cuenta, ¡Inicia Sesión aquí!</p>
                 <input type="button" value="Iniciar Sesión" id="sign-in">
             </div>
         </div>
@@ -173,7 +206,7 @@ $token = csrf_token();
                 <p>Regístrate como estudiante</p>
 
                 <?php if ($error_registro) { ?>
-                    <p style="color:#961818; font-weight:bold;"><?= htmlspecialchars($error_registro) ?></p>
+                    <p style="color:#ef4444; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; font-weight:600; font-size:0.9rem;"><?= htmlspecialchars($error_registro) ?></p>
                 <?php } ?>
 
                 <form class="form" method="POST" autocomplete="off">
@@ -199,7 +232,8 @@ $token = csrf_token();
         </div>
     </div>
 
-    <div class="container-form login hide" id="formLoginBox">
+    <!-- Formulario de Login (Se muestra por defecto al entrar) -->
+    <div class="container-form login" id="formLoginBox">
         <div class="information">
             <div class="info-childs">
                 <h2>¡Qué Bueno Verte de Nuevo!</h2>
@@ -211,9 +245,10 @@ $token = csrf_token();
         <div class="form-information">
             <div class="form-information-childs">
                 <h2>Iniciar Sesión</h2>
+                <p>Accede a tu panel de Edutrivia</p>
 
                 <?php if ($error_login) { ?>
-                    <p style="color:#961818; font-weight:bold;"><?= htmlspecialchars($error_login) ?></p>
+                    <p style="color:#ef4444; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; font-weight:600; font-size:0.9rem;"><?= htmlspecialchars($error_login) ?></p>
                 <?php } ?>
 
                 <form class="form" method="POST" autocomplete="off">
