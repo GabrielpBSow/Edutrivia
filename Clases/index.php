@@ -41,15 +41,14 @@ if ($rol === 'profesor') {
                (SELECT habilitado FROM accesos_juego a WHERE a.clase_id = c.id AND a.estudiante_id = ? AND a.juego = 'jeopardy') AS acceso_jeopardy,
                (SELECT habilitado FROM accesos_juego a WHERE a.clase_id = c.id AND a.estudiante_id = ? AND a.juego = 'ahorcado') AS acceso_ahorcado,
                (SELECT habilitado FROM accesos_juego a WHERE a.clase_id = c.id AND a.estudiante_id = ? AND a.juego = 'carrera') AS acceso_carrera,
-               (SELECT habilitado FROM accesos_juego a WHERE a.clase_id = c.id AND a.estudiante_id = ? AND a.juego = 'memorama') AS acceso_memorama,
-               (SELECT habilitado FROM accesos_juego a WHERE a.clase_id = c.id AND a.estudiante_id = ? AND a.juego = 'crucigrama') AS acceso_crucigrama
+               (SELECT habilitado FROM accesos_juego a WHERE a.clase_id = c.id AND a.estudiante_id = ? AND a.juego = 'memorama') AS acceso_memorama
         FROM inscripciones i
         INNER JOIN clases c ON c.id = i.clase_id
         INNER JOIN usuarios u ON u.id = c.profesor_id
         WHERE i.estudiante_id = ?
         ORDER BY i.fecha_inscripcion DESC
     ");
-    $stmt->bind_param("iiiiii", $uid, $uid, $uid, $uid, $uid, $uid);
+    $stmt->bind_param("iiiii", $uid, $uid, $uid, $uid, $uid);
     $stmt->execute();
     $clases = $stmt->get_result();
 
@@ -608,13 +607,6 @@ if ($rol === 'profesor') {
                                                     <a href="../Juegos/memorama.php?clase_id=<?= (int)$c['id'] ?>" class="juego-link juego-activo" title="Jugar Memorama">🃏</a>
                                                 <?php } else { ?>
                                                     <span class="juego-link juego-bloqueado" title="Tu profesor aún no te ha dado acceso a Memorama">🔒</span>
-                                                <?php } ?>
-
-                                                <!-- Crucigrama -->
-                                                <?php if ((int)($c['acceso_crucigrama'] ?? 0) === 1) { ?>
-                                                    <a href="../Juegos/crucigrama.php?clase_id=<?= (int)$c['id'] ?>" class="juego-link juego-activo" title="Jugar Crucigrama Académico">🧩</a>
-                                                <?php } else { ?>
-                                                    <span class="juego-link juego-bloqueado" title="Tu profesor aún no te ha dado acceso a Crucigrama">🔒</span>
                                                 <?php } ?>
                                             </div>
                                         </td>

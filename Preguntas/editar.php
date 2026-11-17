@@ -86,20 +86,165 @@ unset($_SESSION['error']);
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="img/png" href="../img/LogoEdutrivia (1).png">
     <link rel="stylesheet" href="../css/app.css">
-    <title>Editar Pregunta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Editar Pregunta - Edutrivia</title>
+    <style>
+        :root {
+            --j-purple-dark: #1e1b4b;
+            --j-purple: #6366f1;
+            --j-purple-light: #818cf8;
+            --j-green: #10b981;
+            --j-red: #ef4444;
+            --j-orange: #f59e0b;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            box-sizing: border-box;
+        }
+
+        body.fondo {
+            background: radial-gradient(circle at top left, #312e81 0%, transparent 55%),
+                        radial-gradient(circle at bottom right, #3730a3 0%, transparent 50%),
+                        linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+            min-height: 100vh;
+            padding: 30px 20px;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contenedor-gestion {
+            width: 100%;
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            font-size: 1.4rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.2s;
+            width: fit-content;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .pagina-titulo {
+            font-size: 1.8rem !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 !important;
+        }
+
+        .pagina-titulo i {
+            color: var(--j-purple-light);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--j-red);
+            color: #fca5a5;
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: -6px;
+        }
+
+        .name_input, select {
+            width: 100%;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            padding: 0 16px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .name_input:focus, select:focus {
+            border-color: var(--j-purple-light);
+        }
+
+        select option {
+            background: #1e1b4b;
+            color: white;
+        }
+
+        .btn-principal {
+            background: var(--j-purple);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-principal:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body class="fondo">
 
 <div class="contenedor-gestion">
 
-    <a href="index.php?mazo_id=<?= $mazo_id ?>">
-        <img class="img_before" src="../img/before_writh.png" alt="Volver" style="max-width:42px;">
-    </a>
+    <div>
+        <a href="index.php?mazo_id=<?= $mazo_id ?>" class="back-link" title="Volver al Mazo">
+            <i class='bx bx-arrow-back'></i> Volver
+        </a>
+    </div>
 
-    <h1 class="pagina-titulo"><i class='bx bx-edit'></i> Editar Pregunta</h1>
+    <div>
+        <h1 class="pagina-titulo"><i class='bx bx-edit'></i> Editar Pregunta</h1>
+    </div>
 
     <?php if ($error) { ?>
-        <p style="color:#ffb3b3; text-align:center; font-weight:bold;"><?= htmlspecialchars($error) ?></p>
+        <div class="alert-error"><?= htmlspecialchars($error) ?></div>
     <?php } ?>
 
     <form method="POST" action="editar.php">
@@ -118,11 +263,13 @@ unset($_SESSION['error']);
         <label>Puntaje</label>
         <select name="puntaje" required>
             <?php foreach ([100, 200, 300, 400, 500] as $valor) { ?>
-                <option value="<?= $valor ?>" <?= $p['puntaje'] == $valor ? 'selected' : '' ?>><?= $valor ?></option>
+                <option value="<?= $valor ?>" <?= $p['puntaje'] == $valor ? 'selected' : '' ?>><?= $valor ?> Puntos</option>
             <?php } ?>
         </select>
 
-        <button class="btn" type="submit">Guardar Cambios</button>
+        <button class="btn-principal" type="submit">
+            <i class='bx bx-save' style="font-size: 1.2rem;"></i> Guardar Cambios
+        </button>
     </form>
 
 </div>
