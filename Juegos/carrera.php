@@ -39,21 +39,260 @@ if ($_SESSION['rol'] === 'estudiante') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/juegos.css?v=5">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="img/png" href="../img/LogoEdutrivia (1).png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Carrera de Conocimiento</title>
+    <title>Carrera de Conocimiento - Edutrivia</title>
+    <style>
+        :root {
+            --j-purple-dark: #1e1b4b;
+            --j-purple: #6366f1;
+            --j-red: #ef4444;
+            --j-green: #10b981;
+            --j-orange: #f59e0b;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            box-sizing: border-box;
+        }
+
+        body.pantalla-carrera {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top left, #312e81 0%, transparent 55%),
+                        radial-gradient(circle at bottom right, #3730a3 0%, transparent 50%),
+                        linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Encabezado del juego */
+        .carrera-header {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 14px 22px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .carrera-vidas {
+            color: var(--j-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .carrera-puntaje {
+            color: #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .carrera-progreso {
+            color: #c7d2fe;
+            background: rgba(99, 102, 241, 0.15);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        /* Caja de pregunta */
+        .carrera-pregunta-caja {
+            width: 100%;
+            max-width: 640px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 12px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .carrera-pregunta-texto {
+            font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+            font-weight: 700;
+            margin: 0;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        /* Barra de tiempo */
+        .carrera-timer-track {
+            width: 100%;
+            max-width: 640px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .carrera-timer-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #6366f1, #f59e0b);
+            border-radius: 999px;
+            transition: width linear;
+        }
+
+        /* Pista de carreras */
+        .carrera-pista {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            height: 380px;
+            background: linear-gradient(180deg, #181824 0%, #111118 100%);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.6), 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .carrera-carril {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 2px dashed rgba(255, 255, 255, 0.1);
+            padding: 15px 5px;
+        }
+
+        .carrera-carril:last-child {
+            border-right: none;
+        }
+
+        .carrera-opcion {
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            font-weight: 700;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            border-radius: 14px;
+            padding: 12px 10px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.25s ease;
+            word-break: break-word;
+        }
+
+        .carrera-opcion-centro {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+            font-size: 1.5rem;
+            border: none;
+        }
+
+        .carrera-carril.correcto .carrera-opcion {
+            background: var(--j-green) !important;
+            color: #fff !important;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+
+        .carrera-carril.incorrecto .carrera-opcion {
+            background: var(--j-red) !important;
+            color: #fff !important;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+
+        .carrera-vehiculo {
+            position: absolute;
+            bottom: 6%;
+            font-size: 3rem;
+            transition: left 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6));
+            z-index: 10;
+        }
+
+        /* Controles móviles / botones */
+        .carrera-controles {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 640px;
+        }
+
+        .carrera-controles button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .carrera-controles button:hover {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: var(--j-purple);
+            transform: translateY(-2px);
+        }
+
+        .carrera-controles button:active {
+            transform: translateY(0);
+        }
+
+        /* Estilo SweetAlert personalizado */
+        .swal2-popup {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            border-radius: 24px !important;
+            background: #1e1b4b !important;
+            color: #fff !important;
+        }
+        .swal2-title {
+            color: #fff !important;
+        }
+        .swal2-html-container {
+            color: #c7d2fe !important;
+        }
+    </style>
 </head>
 <body class="pantalla-carrera">
 
     <div class="carrera-header">
-        <span>❤️ <span id="vidas-count">3</span></span>
-        <span>Puntaje: <span id="puntaje-count">0</span></span>
-        <span><span id="pregunta-num">0</span>/10</span>
+        <div class="carrera-vidas">
+            <i class='bx bxs-heart' style="font-size: 1.3rem;"></i> <span id="vidas-count">3</span>
+        </div>
+        <div class="carrera-puntaje">
+            <i class='bx bx-trophy' style="font-size: 1.3rem;"></i> <span id="puntaje-count">0</span> pts
+        </div>
+        <div class="carrera-progreso">
+            Pregunta <span id="pregunta-num">0</span>/10
+        </div>
     </div>
 
     <div class="carrera-pregunta-caja">
-        <p class="carrera-pregunta-texto" id="pregunta-texto">Cargando...</p>
+        <p class="carrera-pregunta-texto" id="pregunta-texto">Cargando carrera...</p>
     </div>
 
     <div class="carrera-timer-track">
@@ -65,28 +304,28 @@ if ($_SESSION['rol'] === 'estudiante') {
             <div class="carrera-opcion" id="opcion-izquierda">-</div>
         </div>
         <div class="carril-centro carrera-carril">
-            <div class="carrera-opcion carrera-opcion-centro">¿?</div>
+            <div class="carrera-opcion carrera-opcion-centro"><i class='bx bx-chevrons-up'></i></div>
         </div>
         <div class="carril-derecha carrera-carril">
             <div class="carrera-opcion" id="opcion-derecha">-</div>
         </div>
-        <div class="carrera-vehiculo" id="vehiculo">🏍️</div>
+        <div class="carrera-vehiculo" id="vehiculo">🏎️</div>
     </div>
 
     <div class="carrera-controles">
-        <button id="btn-izquierda">⬅️</button>
-        <button id="btn-derecha">➡️</button>
+        <button id="btn-izquierda" title="Mover a la izquierda"><i class='bx bx-left-arrow-alt'></i></button>
+        <button id="btn-derecha" title="Mover a la derecha"><i class='bx bx-right-arrow-alt'></i></button>
     </div>
 
     <script>
       const CLASE_ID = <?= $clase_id ?>;
-      const DURACION_PREGUNTA_MS = 5000;
+      const DURACION_PREGUNTA_MS = 6000;
 
-      /* Sonidos generados con Web Audio API (mismo patrón que Ahorcado/Jeopardy) */
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
       function tono(frecuencia, duracionMs, tipo = 'sine', volumen = 0.15, retrasoMs = 0) {
         setTimeout(() => {
+          if (audioCtx.state === 'suspended') { audioCtx.resume(); }
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = tipo;
@@ -138,7 +377,7 @@ if ($_SESSION['rol'] === 'estudiante') {
       let evaluando = false;
 
       function posicionarVehiculo() {
-        const posiciones = { [CARRIL_IZQUIERDA]: '13%', [CARRIL_CENTRO]: '46%', [CARRIL_DERECHA]: '79%' };
+        const posiciones = { [CARRIL_IZQUIERDA]: '12%', [CARRIL_CENTRO]: '45%', [CARRIL_DERECHA]: '78%' };
         vehiculoElement.style.left = posiciones[carrilActual];
       }
 
@@ -156,7 +395,6 @@ if ($_SESSION['rol'] === 'estudiante') {
         if (e.key === 'ArrowRight') moverA(CARRIL_DERECHA);
       });
 
-      /* Swipe táctil sobre la pista */
       let touchStartX = null;
       pistaElement.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
@@ -198,7 +436,7 @@ if ($_SESSION['rol'] === 'estudiante') {
           text: `Terminaste con ${puntaje} puntos.`,
           icon: 'error',
           confirmButtonText: 'Continuar',
-          confirmButtonColor: '#5B2C8C'
+          confirmButtonColor: '#6366f1'
         }).then(() => guardarYRedirigir(puntaje));
       }
 
@@ -210,7 +448,7 @@ if ($_SESSION['rol'] === 'estudiante') {
           text: `Terminaste con ${puntaje} puntos.`,
           icon: 'success',
           confirmButtonText: 'Continuar',
-          confirmButtonColor: '#5B2C8C'
+          confirmButtonColor: '#6366f1'
         }).then(() => guardarYRedirigir(puntaje));
       }
 
@@ -232,7 +470,6 @@ if ($_SESSION['rol'] === 'estudiante') {
         opcionDerElement.textContent = p.opcion_derecha;
         preguntaNumElement.textContent = indiceActual + 1;
 
-        // Reiniciar la barra de tiempo (truco de reflow para que la transición se vea desde el 100%)
         timerFillElement.style.transition = 'none';
         timerFillElement.style.width = '100%';
         void timerFillElement.offsetWidth;
@@ -247,9 +484,7 @@ if ($_SESSION['rol'] === 'estudiante') {
         evaluando = true;
 
         const p = preguntas[indiceActual];
-        // El backend manda 0 = izquierda, 1 = derecha; lo traducimos a los carriles reales
         const carrilCorrectoReal = p.carril_correcto === 0 ? CARRIL_IZQUIERDA : CARRIL_DERECHA;
-        // Quedarse parado en el centro cuenta como no responder: siempre es fallo
         const acerto = carrilActual !== CARRIL_CENTRO && carrilActual === carrilCorrectoReal;
 
         if (acerto) {
@@ -285,7 +520,7 @@ if ($_SESSION['rol'] === 'estudiante') {
               text: data.error,
               icon: 'warning',
               confirmButtonText: 'Volver',
-              confirmButtonColor: '#5B2C8C'
+              confirmButtonColor: '#6366f1'
             }).then(() => window.location.href = '../Clases/index.php');
             return;
           }

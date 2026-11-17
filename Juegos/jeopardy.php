@@ -35,20 +35,297 @@ if ($_SESSION['rol'] === 'estudiante') {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/juegos.css?v=3">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="icon" type="img/png" href="../img/LogoEdutrivia (1).png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Jeopardy</title>
+    <title>Jeopardy - Edutrivia</title>
+    <style>
+        :root {
+            --j-purple-dark: #1e1b4b;
+            --j-purple: #6366f1;
+            --j-purple-light: #818cf8;
+            --j-green: #10b981;
+            --j-red: #ef4444;
+            --j-orange: #f59e0b;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            box-sizing: border-box;
+        }
+
+        body.pantalla-jeopardy {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #312e81 0%, transparent 55%),
+                        radial-gradient(circle at bottom right, #3730a3 0%, transparent 50%),
+                        linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            padding: 20px;
+        }
+
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Encabezado Principal */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffb703;
+            margin: 0;
+        }
+
+        .score-count {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        /* Tablero */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .column {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .column header {
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-size: 0.85rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+            text-align: center;
+            min-height: 3.5em;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .column ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .column li {
+            margin: 0;
+        }
+
+        .column button.clue-card {
+            height: 3.6em;
+            width: 100%;
+            color: #ffb703;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .column button.clue-card:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--j-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .column button.clue-card.used {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Modal de Pregunta */
+        .card-modal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .card-modal.visible {
+            opacity: 1;
+            pointer-events: initial;
+        }
+
+        .card-modal.showing-result .result {
+            display: block;
+        }
+
+        .card-modal-inner {
+            width: 100%;
+            max-width: 560px;
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-modal .clue-text {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-weight: 700;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #0f172a;
+        }
+
+        .result,
+        .card-modal.showing-result form {
+            display: none;
+        }
+
+        .card-modal form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .card-modal form input[type="text"] {
+            flex-grow: 1;
+            height: 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            background: #faf8fc;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0 16px;
+            color: #0f172a;
+            transition: border-color 0.2s;
+        }
+
+        .card-modal form input[type="text"]:focus {
+            outline: none;
+            border-color: var(--j-purple);
+        }
+
+        .card-modal form button[type="submit"] {
+            padding: 0 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            color: #fff;
+            background: var(--j-purple);
+            border: 0;
+            border-radius: 14px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        }
+
+        .card-modal form button[type="submit"]:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        .result_success, .result_fail {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .result_success { color: var(--j-green); }
+        .result_fail { color: var(--j-red); }
+
+        .result_correct-answer {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+
+        .result_correct-answer-text {
+            font-weight: 800;
+            font-size: 1.1rem;
+            display: block;
+            margin-top: 4px;
+            color: var(--j-purple);
+        }
+
+        /* Estilo SweetAlert acorde */
+        .swal2-popup {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            border-radius: 24px !important;
+            background: #1e1b4b !important;
+            color: #fff !important;
+        }
+        .swal2-title {
+            color: #fff !important;
+        }
+        .swal2-html-container {
+            color: #c7d2fe !important;
+        }
+    </style>
 </head>
 <body class="pantalla-jeopardy">
     <div class="app">
         <header class="top-header">
-            <h1>Edutrivia</h1>
-            <p class="score">Score: <span class="score-count">0</span></p>
+            <h1><i class='bx bx-brain' style="color: var(--j-purple);"></i> Edutrivia Jeopardy</h1>
+            <p class="score"><i class='bx bx-trophy'></i> Puntuación: <span class="score-count">0</span></p>
         </header>
         <div class="board">
         </div>
@@ -56,14 +333,15 @@ if ($_SESSION['rol'] === 'estudiante') {
             <div class="card-modal-inner">
                 <h2 class="clue-text"></h2>
                 <form autocomplete="off">
-                    <input name="user-answer" type="text"/>
-                    <button type="submit">PREGUNTA</button>
+                    <input name="user-answer" type="text" placeholder="Escribe tu respuesta..." />
+                    <button type="submit">Evaluar</button>
                 </form>
                 <div class="result">
-                    <p class="result_success">CORRECTO</p>
-                    <p class="result_fail">INCORRECTO</p>
+                    <p class="result_success">¡CORRECTO! 🎉</p>
+                    <p class="result_fail">INCORRECTO ❌</p>
                     <p class="result_correct-answer">
-                        La respuesta correcta es: <span class="result_correct-answer-text"></span>
+                        La respuesta correcta era: 
+                        <span class="result_correct-answer-text"></span>
                     </p>
                 </div>
             </div>
@@ -72,11 +350,11 @@ if ($_SESSION['rol'] === 'estudiante') {
     <script>
     const CLASE_ID = <?= $clase_id ?>;
 
-    /* Sonidos generados con Web Audio API (sin archivos externos que subir) */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function tono(frecuencia, duracionMs, tipo = 'sine', volumen = 0.15, retrasoMs = 0) {
         setTimeout(() => {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = tipo;
@@ -150,7 +428,7 @@ if ($_SESSION['rol'] === 'estudiante') {
                             text: data.error,
                             icon: 'warning',
                             confirmButtonText: 'Volver',
-                            confirmButtonColor: '#5B2C8C'
+                            confirmButtonColor: '#6366f1'
                         }).then(() => window.location.href = '../Clases/index.php');
                         return;
                     }
@@ -161,7 +439,7 @@ if ($_SESSION['rol'] === 'estudiante') {
                             text: 'Esta clase todavía no tiene mazos activos con preguntas.',
                             icon: 'info',
                             confirmButtonText: 'Volver',
-                            confirmButtonColor: '#5B2C8C'
+                            confirmButtonColor: '#6366f1'
                         }).then(() => window.location.href = '../Clases/index.php');
                         return;
                     }
@@ -263,7 +541,7 @@ if ($_SESSION['rol'] === 'estudiante') {
                 text: `Terminaste con ${finalScore} puntos.`,
                 icon: 'success',
                 confirmButtonText: 'Continuar',
-                confirmButtonColor: '#5B2C8C'
+                confirmButtonColor: '#6366f1'
             }).then(() => {
                 fetch('guardar_resultado.php', {
                     method: 'POST',
